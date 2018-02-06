@@ -1,0 +1,1 @@
+srun --partition=amd-longq python train.py
