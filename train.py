@@ -1,10 +1,8 @@
 from GAN import *
 
 # Path of training image
+from config import *
 
-img_dirA = 'G:/FakeAppData/128/taohong128/*.*'
-img_dirB = 'G:/FakeAppData/128/xuecong128/*.*'
-model_dir = 'G:/Face-gan/models/'
 try:
     encoder.load_weights(model_dir + "encoder.h5")
     decoder_A.load_weights(model_dir + "decoder_A.h5")
