@@ -52,7 +52,7 @@ use_instancenorm = False
 use_mixup = True
 mixup_alpha = 0.2  # 0.2
 
-batchSize = 4
+batchSize = 256
 lrD = 1e-4  # Discriminator learning rate
 lrG = 1e-4  # Generator learning rate
 
