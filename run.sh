@@ -1,1 +1,1 @@
-srun --partition=amd-longq python train.py
+srun --partition=amd-longq --nodelist=gpu04 python train.py
