@@ -31,7 +31,7 @@ gen_iterations = 0
 epoch = 0
 errGA_sum = errGB_sum = errDA_sum = errDB_sum = 0
 
-display_iters = 300
+display_iters = 50
 train_batchA = minibatchAB(train_A, batchSize)
 train_batchB = minibatchAB(train_B, batchSize)
 
@@ -80,7 +80,5 @@ while True:
         decoder_B.save_weights(model_dir + "decoder_B.h5")
         netDA.save_weights(model_dir + "netDA.h5")
         netDB.save_weights(model_dir + "netDB.h5")
-    if loss_DA_display < expect_loss_A and loss_DB_display < expect_loss_B and epoch > 500:
-        break
 
 print("Training Complete!")
