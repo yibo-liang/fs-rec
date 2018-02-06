@@ -80,7 +80,7 @@ while True:
         decoder_B.save_weights(model_dir + "decoder_B.h5")
         netDA.save_weights(model_dir + "netDA.h5")
         netDB.save_weights(model_dir + "netDB.h5")
-    if loss_DA_display < expect_loss_A and loss_DB_display < expect_loss_B and display_iters > 100:
+    if loss_DA_display < expect_loss_A and loss_DB_display < expect_loss_B and epoch > 500:
         break
 
 print("Training Complete!")
