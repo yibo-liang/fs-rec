@@ -363,7 +363,13 @@ netGB_train = K.function([distorted_B, real_B], [loss_GB], training_updates)
 
 
 def load_data(file_pattern):
-    return glob.glob(file_pattern)
+    def format_dir(s="./"):
+        if s.endswith("/"):
+            return s
+        else:
+            return s+"/"
+
+    return glob.glob(format_dir(file_pattern)+"*.*")
 
 
 random_transform_args = {
