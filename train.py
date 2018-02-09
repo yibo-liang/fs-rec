@@ -1,7 +1,6 @@
 from GAN import *
 
 # Path of training image
-from config import *
 
 # Get filenames
 train_A = load_data(img_dirA)
