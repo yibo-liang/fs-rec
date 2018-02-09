@@ -1,1 +1,3 @@
-srun --partition=amd-longq --nodelist=gpu04 python train.py
+srun --partition=intel-longq --gres=gpu:p100 --pty bash
+
+
