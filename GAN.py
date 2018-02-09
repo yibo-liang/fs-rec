@@ -52,7 +52,7 @@ use_instancenorm = False
 use_mixup = True
 mixup_alpha = 0.2  # 0.2
 
-batchSize = 64
+batchSize = 4
 lrD = 1e-4  # Discriminator learning rate
 lrG = 1e-4  # Generator learning rate
 
@@ -328,7 +328,17 @@ else:
     vggface_feat = None
 
 # In[19]:
-
+from config import *
+try:
+    encoder.load_weights(model_dir + "encoder.h5")
+    decoder_A.load_weights(model_dir + "decoder_A.h5")
+    decoder_B.load_weights(model_dir + "decoder_B.h5")
+    netDA.load_weights(model_dir + "netDA.h5")
+    netDB.load_weights(model_dir + "netDB.h5")
+    print("model loaded.")
+except:
+    print("Weights file not found.")
+    pass
 
 loss_DA, loss_GA = define_loss(netDA, real_A, fake_A, fake_sz64_A, distorted_A, vggface_feat)
 loss_DB, loss_GB = define_loss(netDB, real_B, fake_B, fake_sz64_B, distorted_B, vggface_feat)
@@ -363,7 +373,13 @@ netGB_train = K.function([distorted_B, real_B], [loss_GB], training_updates)
 
 
 def load_data(file_pattern):
-    return glob.glob(file_pattern)
+    def format_dir(s="./"):
+        if s.endswith("/"):
+            return s
+        else:
+            return s+"/"
+
+    return glob.glob(format_dir(file_pattern)+"*.*")
 
 
 random_transform_args = {
