@@ -44,6 +44,8 @@ channel_first = False
 
 from config import *
 
+print("Batch size = %d" % batchSize)
+
 IMAGE_SHAPE = (128, 128, 3)
 nc_in = 3  # number of input channels of generators
 nc_D_inp = 6  # number of input channels of discriminators

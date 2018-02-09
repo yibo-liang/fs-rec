@@ -1,7 +1,5 @@
 from GAN import *
 
-# Path of training image
-
 # Get filenames
 train_A = load_data(img_dirA)
 train_B = load_data(img_dirB)
@@ -45,21 +43,21 @@ while True:
     errGB_sum += errGB[0]
     gen_iterations += 1
 
-    loss_DA_display = errDA_sum
-    loss_DB_display = errDB_sum
-    loss_GA_display = errGA_sum
-    loss_GB_display = errGB_sum
-
     if gen_iterations % display_iters == 0:
+
+        loss_DA_display = errDA_sum / display_iters
+        loss_DB_display = errDB_sum / display_iters
+        loss_GA_display = errGA_sum / display_iters
+        loss_GB_display = errGB_sum / display_iters
         print('[epoch=%d][gen=%d] Per epoch:: Loss_DA: %05f Loss_DB: %05f Loss_GA: %05f Loss_GB: %05f time: %01f'
               % (epoch, gen_iterations, loss_DA_display, loss_DB_display,
-                 errGA_sum / display_iters, errGB_sum / display_iters, time.time() - t0))
+                 loss_GA_display, loss_GB_display, time.time() - t0))
         # if gen_iterations % display_iters == 0:  # clear_output every display_iters iters
         #     clear_output()
 
         # get new batch of images and generate results for visualization
-        _, wA, tA = train_batchA.send(14)
-        _, wB, tB = train_batchB.send(14)
+        # _, wA, tA = train_batchA.send(14)
+        # _, wB, tB = train_batchB.send(14)
         # showG(tA, tB, path_A, path_B)
         # showG(wA, wB, path_bgr_A, path_bgr_B)
         # showG_mask(tA, tB, path_mask_A, path_mask_B)
