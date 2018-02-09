@@ -42,6 +42,8 @@ K.set_learning_phase(1)
 channel_axis = -1
 channel_first = False
 
+from config import *
+
 IMAGE_SHAPE = (128, 128, 3)
 nc_in = 3  # number of input channels of generators
 nc_D_inp = 6  # number of input channels of discriminators
@@ -52,7 +54,6 @@ use_instancenorm = False
 use_mixup = True
 mixup_alpha = 0.2  # 0.2
 
-batchSize = 4
 lrD = 1e-4  # Discriminator learning rate
 lrG = 1e-4  # Generator learning rate
 
