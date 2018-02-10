@@ -322,49 +322,71 @@ from PIL import Image
 import traceback
 import sys
 
+import queue
+import threading
+
 global count
 count = 0
+global lock
+lock = threading.Lock()
+global file_queue
+file_queue = queue.Queue()
 
 
-def overfit_crop(input_dir, output_dir, str_rule):
+def img_crop(image):
+    faces = face_recognition.face_locations(image)
+    result = []
+    for face in faces:
+        (x0, y1, x1, y0) = face
+        (x0, x1, y0, y1) = adjust_face(x0, x1, y0, y1, image.shape)
+        result.append(image[x0:x1, y0:y1, :])
+    return result
+
+
+import os
+
+
+def deal_file(arg):
+    file, output_dir = arg
+    id = os.getpid()
+    output_dir = format_dir(output_dir)
+    print("%d : %s." % (id, file))
+
+    try:
+
+        image_data = cv2.imdecode(np.fromfile(file, dtype=np.uint8), -1)
+        image_data = cv2.cvtColor(image_data, cv2.COLOR_BGR2RGB)
+
+        data = img_crop(image_data)
+        count = 0
+
+        file_shortname = file.split("/")[-1].split(".")[0]
+        for d in data:
+            count += 1
+
+            filename = file_shortname + "_" + str(count) + ".png"
+            Image.fromarray(d).save(output_dir + filename)
+            print(str(id) + " : " + output_dir + filename + " saved.")
+    except Exception as ex:
+
+        print(traceback.format_exc())
+        # or
+        print(sys.exc_info()[0])
+        print("cannot process file : " + file)
+
+
+def overfit_crop(input_dir, output_dir):
     input_dir = format_dir(input_dir)
     output_dir = format_dir(output_dir)
 
-    def img_crop(image):
-        faces = face_recognition.face_locations(image)
-        result = []
-        for face in faces:
-            (x0, y1, x1, y0) = face
-            (x0, x1, y0, y1) = adjust_face(x0, x1, y0, y1, image.shape)
-            result.append(image[x0:x1, y0:y1, :])
-        return result
-
     for file in list_files(input_dir):
-
-        try:
-
-            image_data = cv2.imdecode(np.fromfile(file, dtype=np.uint8), -1)
-            #image_data = cv2.cvtColor(image_data, cv2.COLOR_BGR2RGB)
-
-            data = img_crop(image_data)
-
-            for d in data:
-                global count
-                count += 1
-                filename = str_rule % count
-                Image.fromarray(d).save(output_dir + filename)
-            print(file + " done.")
-        except Exception as ex:
-
-            print(traceback.format_exc())
-            # or
-            print(sys.exc_info()[0])
-            print("cannot open file : " + input_dir + filename)
+        # print("put file " + file)
+        file_queue.put(file)
 
 
 if __name__ == "__main__":
 
-    sources = [#"G:/Pictures/love/nichijo/Icecream",
+    sources = ["G:/Pictures/love/nichijo/Icecream",
                "G:/Pictures/love/nichijo/某次吃饭",
                "G:/Pictures/love/nichijo/雪藏",
                "G:/Pictures/love/phone/20150106",
@@ -373,21 +395,33 @@ if __name__ == "__main__":
                "G:/Pictures/love/Sure",
                "G:/Pictures/love/Wedding/姚辉",
                "G:/Pictures/love/Wedding/好看的"]
+    all_args = []
+
+    output_dir, str_rule = "G:\\FakeAppData\\xuecong\\new", "xuecong%07d.png"
+    i = 0
     for d in sources:
         print("Working in Dir = " + d)
-        overfit_crop(d, "G:\\FakeAppData\\xuecong\\new", "xuecong%07d.png")
-#
-# #
-# #
-# test_all("G:\\FakeAppData\\face_test", encs_A)
-# test_all("G:\\FakeAppData\\face_test", encs_zhang)
-# known_image = face_recognition.load_image_file(slash_sub("G:\\FakeAppData\\g\\b.png"))
-# unknown_image = face_recognition.load_image_file(slash_sub("G:\\FakeAppData\\g\\g.png"))
-# test_image = face_recognition.load_image_file(slash_sub("G:\\FakeAppData\\face_test\\out0000453.png"))
-#
-# biden_encoding = face_recognition.face_encodings(known_image)[0]
-# unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
-# test_enc = face_recognition.face_encodings(test_image)[0]
-#
-# results = face_recognition.compare_faces([biden_encoding, unknown_encoding], test_enc)
-# print(results)
+        # overfit_crop(d, "G:\\FakeAppData\\xuecong\\new", "xuecong%07d.png")
+        i += 1
+        for f in list_files(d):
+            arg = (f, output_dir)
+            all_args.append(arg)
+
+    threads = []
+    from multiprocessing import Process, Pool
+
+    Pool(processes=5).map(deal_file, all_args)
+    # #
+    # #
+    # test_all("G:\\FakeAppData\\face_test", encs_A)
+    # test_all("G:\\FakeAppData\\face_test", encs_zhang)
+    # known_image = face_recognition.load_image_file(slash_sub("G:\\FakeAppData\\g\\b.png"))
+    # unknown_image = face_recognition.load_image_file(slash_sub("G:\\FakeAppData\\g\\g.png"))
+    # test_image = face_recognition.load_image_file(slash_sub("G:\\FakeAppData\\face_test\\out0000453.png"))
+    #
+    # biden_encoding = face_recognition.face_encodings(known_image)[0]
+    # unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
+    # test_enc = face_recognition.face_encodings(test_image)[0]
+    #
+    # results = face_recognition.compare_faces([biden_encoding, unknown_encoding], test_enc)
+    # print(results)
