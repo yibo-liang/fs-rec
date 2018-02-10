@@ -3,3 +3,4 @@ img_dirA = 'path/to/dataset_A'
 img_dirB =  'path/to/dataset_B'
 model_dir = 'path/to/save/model'
 batchSize = 256
+temp_show_dir = "./img/"

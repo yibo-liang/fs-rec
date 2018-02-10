@@ -2,3 +2,4 @@ config.py
 *.sh
 model/
 __pycache__
+img/*.*

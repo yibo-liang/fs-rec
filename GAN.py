@@ -187,8 +187,6 @@ def Decoder_ps(nc_in=512, input_size=8):
 # In[88]:
 
 
-
-
 # <a id='7'></a>
 # # 7. Define Inputs/Outputs Variables
 #
@@ -332,6 +330,7 @@ else:
 
 # In[19]:
 from config import *
+
 try:
     encoder.load_weights(model_dir + "encoder.h5")
     decoder_A.load_weights(model_dir + "decoder_A.h5")
@@ -380,9 +379,9 @@ def load_data(file_pattern):
         if s.endswith("/"):
             return s
         else:
-            return s+"/"
+            return s + "/"
 
-    return glob.glob(format_dir(file_pattern)+"*.*")
+    return glob.glob(format_dir(file_pattern) + "*.*")
 
 
 random_transform_args = {
@@ -433,7 +432,7 @@ def minibatchAB(dataA, batchsize):
 # In[23]:
 
 
-def showG(test_A, test_B, path_A, path_B):
+def showG(test_A, test_B, path_A, path_B, filename):
     figure_A = np.stack([
         test_A,
         np.squeeze(np.array([path_A([test_A[i:i + 1]]) for i in range(test_A.shape[0])])),
@@ -449,12 +448,12 @@ def showG(test_A, test_B, path_A, path_B):
     figure = figure.reshape((4, 7) + figure.shape[1:])
     figure = stack_images(figure)
     figure = np.clip((figure + 1) * 255 / 2, 0, 255).astype('uint8')
-    figure = cv2.cvtColor(figure, cv2.COLOR_BGR2RGB)
+    # figure = cv2.cvtColor(figure, cv2.COLOR_BGR2RGB)
+    cv2.imwrite(filename, figure)
+    # display(Image.fromarray(figure))
 
-    display(Image.fromarray(figure))
 
-
-def showG_mask(test_A, test_B, path_A, path_B):
+def showG_mask(test_A, test_B, path_A, path_B, filename):
     figure_A = np.stack([
         test_A,
         (np.squeeze(np.array([path_A([test_A[i:i + 1]]) for i in range(test_A.shape[0])]))) * 2 - 1,
@@ -470,9 +469,9 @@ def showG_mask(test_A, test_B, path_A, path_B):
     figure = figure.reshape((4, 7) + figure.shape[1:])
     figure = stack_images(figure)
     figure = np.clip((figure + 1) * 255 / 2, 0, 255).astype('uint8')
-    figure = cv2.cvtColor(figure, cv2.COLOR_BGR2RGB)
-
-    display(Image.fromarray(figure))
+    # figure = cv2.cvtColor(figure, cv2.COLOR_BGR2RGB)
+    cv2.imwrite(filename, figure)
+    # display(Image.fromarray(figure))
 
 
 print("GAN loaded.")

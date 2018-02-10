@@ -60,11 +60,11 @@ while True:
         #     clear_output()
 
         # get new batch of images and generate results for visualization
-        # _, wA, tA = train_batchA.send(14)
-        # _, wB, tB = train_batchB.send(14)
-        # showG(tA, tB, path_A, path_B)
-        # showG(wA, wB, path_bgr_A, path_bgr_B)
-        # showG_mask(tA, tB, path_mask_A, path_mask_B)
+        _, wA, tA = train_batchA.send(14)
+        _, wB, tB = train_batchB.send(14)
+        showG(tA, tB, path_A, path_B, temp_show_dir + "combined.png")
+        showG(wA, wB, path_bgr_A, path_bgr_B, temp_show_dir + "generated.png")
+        showG_mask(tA, tB, path_mask_A, path_mask_B, temp_show_dir + "mask.png")
 
         errGA_sum = errGB_sum = errDA_sum = errDB_sum = 0
 
