@@ -1,4 +1,4 @@
 config.py
 *.sh
 model/
-_pycache_
+__pycache__
