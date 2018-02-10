@@ -1,3 +1,4 @@
 config.py
 *.sh
 model/
+_pycache_
