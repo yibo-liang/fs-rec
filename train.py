@@ -1,8 +1,12 @@
 from GAN import *
 
+from random import shuffle
+
 # Get filenames
 train_A = load_data(img_dirA)
 train_B = load_data(img_dirB)
+shuffle(train_A)
+shuffle(train_B)
 
 assert len(train_A), "No image found in " + str(img_dirA)
 assert len(train_B), "No image found in " + str(img_dirB)
