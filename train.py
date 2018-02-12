@@ -73,7 +73,7 @@ while True:
         errGA_sum = errGB_sum = errDA_sum = errDB_sum = 0
 
         # Save models
-        if loss_DA_display < min_loss_A:
+        if loss_DA_display < min_loss_A and epoch > 5:
             min_loss_A = loss_DA_display
             # if gen_iterations % (display_iters * 3) == 0:
             print("Saved Model to " + model_dir)
