@@ -392,6 +392,13 @@ random_transform_args = {
 }
 
 
+def rotateImage(image, angle):
+    image_center = tuple(np.array(image.shape[1::-1]) / 2)
+    rot_mat = cv2.getRotationMatrix2D(image_center, angle, 1.0)
+    result = cv2.warpAffine(image, rot_mat, image.shape[1::-1], flags=cv2.INTER_LINEAR)
+    return result
+
+
 def read_image(fn, random_transform_args=random_transform_args):
     image = cv2.imread(fn)
     image = cv2.resize(image, (256, 256)) / 255 * 2 - 1

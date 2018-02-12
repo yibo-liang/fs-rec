@@ -26,6 +26,8 @@ display_iters = 10
 train_batchA = minibatchAB(train_A, batchSize)
 train_batchB = minibatchAB(train_B, batchSize)
 
+min_loss_A = 999
+last_epoch = -1
 while True:
     epoch, warped_A, target_A = next(train_batchA)
     epoch, warped_B, target_B = next(train_batchB)
@@ -47,7 +49,9 @@ while True:
     errGB_sum += errGB[0]
     gen_iterations += 1
 
-    if gen_iterations % display_iters == 0:
+    if epoch > last_epoch:
+        last_epoch = epoch
+        # if gen_iterations % display_iters == 0:
 
         loss_DA_display = errDA_sum / display_iters
         loss_DB_display = errDB_sum / display_iters
@@ -69,7 +73,9 @@ while True:
         errGA_sum = errGB_sum = errDA_sum = errDB_sum = 0
 
         # Save models
-        if gen_iterations % (display_iters * 3) == 0:
+        if loss_DA_display < min_loss_A:
+            min_loss_A = loss_DA_display
+            # if gen_iterations % (display_iters * 3) == 0:
             print("Saved Model to " + model_dir)
             encoder.save_weights(model_dir + "encoder.h5")
             decoder_A.save_weights(model_dir + "decoder_A.h5")

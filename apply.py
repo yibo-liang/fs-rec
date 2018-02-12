@@ -95,15 +95,10 @@ def process_frame(input_img):
 
     face = faces[0]
     if len(faces) > 1:
-        encs = [face_helper._face_encodings(image, known_face_locations=face, model="small") for face in faces]
+        encs = face_helper._face_encodings(image, known_face_locations=faces, model="small")
         predicts = model.predict_proba(encs)
-        select = -1
-        for i in range(len(predicts)):
-            if predicts[i] == 0:
-                select = i
-                break
-        if select == -1:
-            return image
+        possibility_of_p = [predicts[i][0] for i in range(len(predicts))]
+        select = possibility_of_p.index(max(possibility_of_p))
         face = faces[select]
 
     # coordinates
@@ -205,4 +200,12 @@ def process_files(input_dir, output_dir, str_rule):
                 print("cannot open file : " + input_dir + filename)
 
 
-process_files("G:\\FakeAppData\\frames_128", "G:\\FakeAppData\\video\\result", "out%07d.png")
+try:
+    a = cv2.imread("G:/FakeAppData/frames_128/out0008797.png")
+    t = process_frame(a)
+    cv2.imwrite("g:/FakeAppData/t.png", img=t)
+except:
+    print(traceback.format_exc())
+    # or
+    print(sys.exc_info()[0])
+# process_files("G:\\FakeAppData\\frames_128", "G:\\FakeAppData\\video\\result", "out%07d.png")
