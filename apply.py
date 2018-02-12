@@ -32,8 +32,8 @@ from moviepy.editor import VideoFileClip
 global prev_x0, prev_x1, prev_y0, prev_y1
 prev_x0 = prev_x1 = prev_y0 = prev_y1 = 0
 
-use_smoothed_mask = False
-use_smoothed_bbox = False
+use_smoothed_mask = True
+use_smoothed_bbox = True
 
 
 def get_smoothed_coord(x0, x1, y0, y1):
@@ -53,7 +53,7 @@ def set_global_coord(x0, x1, y0, y1):
     prev_y0 = y0
 
 
-whom2whom = "BtoA"  # default trainsforming faceB to faceA
+whom2whom = "AtoB"  # default trainsforming faceB to faceA
 
 if whom2whom is "AtoB":
     path_func = path_abgr_B
@@ -78,12 +78,11 @@ model = classifiers(
     [taohong_encs + taohong_all_encs, wild_encs, red_others_encs, tielin_encs, yingzuo_encs, zhangluyi_encs])
 
 
-
 def process_frame(input_img):
     # modify this line to reduce input size
     # input_img = input_img[:, input_img.shape[1]//3:2*input_img.shape[1]//3,:]
     image = input_img
-    faces = face_recognition.face_locations(image)  # model="cnn"
+    faces = face_recognition.face_locations(image, model="cnn")  # model="cnn"
 
     if len(faces) == 0:
         result_img = image
@@ -93,12 +92,19 @@ def process_frame(input_img):
 
     global prev_x0, prev_x1, prev_y0, prev_y1
     global frames
+
     face = faces[0]
     if len(faces) > 1:
         encs = [face_helper._face_encodings(image, known_face_locations=face, model="small") for face in faces]
         predicts = model.predict_proba(encs)
-        max_i = predicts.index(max(predicts))
-        face = faces[max_i]
+        select = -1
+        for i in range(len(predicts)):
+            if predicts[i] == 0:
+                select = i
+                break
+        if select == -1:
+            return image
+        face = faces[select]
 
     # coordinates
     (x0, y1, x1, y0) = face
@@ -127,7 +133,7 @@ def process_frame(input_img):
         orig_img = cv2.cvtColor(roi_image, cv2.COLOR_BGR2RGB)
 
     ae_input = cv2.resize(roi_image, (128, 128)) / 255. * 2 - 1
-    result = np.squeeze(np.array([path_abgr_A([[ae_input]])]))  # Change path_A/path_B here
+    result = np.squeeze(np.array([path_func([[ae_input]])]))  # Change path_A/path_B here
     result_a = result[:, :, 0] * 255
     # result_a = np.clip(result_a * 1.5, 0, 255).astype('uint8')
     result_bgr = np.clip((result[:, :, 1:] + 1) * 255 / 2, 0, 255)
@@ -141,17 +147,9 @@ def process_frame(input_img):
     mask_map = np.clip(mask_map + .15 * input_img, 0, 255)
 
     result = cv2.resize(result, (roi_size[1], roi_size[0]))
-
-    result_img = np.zeros([input_img.shape[0], input_img.shape[1], input_img.shape[2]])
-    result_img[:, :, :] = input_img
     comb_img = np.zeros([input_img.shape[0], input_img.shape[1] * 2, input_img.shape[2]])
     comb_img[:, :input_img.shape[1], :] = input_img
     comb_img[:, input_img.shape[1]:, :] = input_img
-    if use_smoothed_mask:
-        result_img[x0 + h // 15:x1 - h // 15,
-        y0 + w // 15:y1 - w // 15, :] = mask / 255 * result + (1 - mask / 255) * orig_img
-    else:
-        result_img[x0 + h // 15:x1 - h // 15, y0 + w // 15:y1 - w // 15, :] = result
 
     if use_smoothed_mask:
         comb_img[x0 + h // 15:x1 - h // 15, input_img.shape[1] + y0 + w // 15:input_img.shape[1] + y1 - w // 15,
@@ -207,4 +205,4 @@ def process_files(input_dir, output_dir, str_rule):
                 print("cannot open file : " + input_dir + filename)
 
 
-# process_files("G:\\FakeAppData\\frames_128", "G:\\FakeAppData\\video\\result", "out%07d.png")
+process_files("G:\\FakeAppData\\frames_128", "G:\\FakeAppData\\video\\result", "out%07d.png")
