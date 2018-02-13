@@ -208,4 +208,5 @@ except:
     print(traceback.format_exc())
     # or
     print(sys.exc_info()[0])
-# process_files("G:\\FakeAppData\\frames_128", "G:\\FakeAppData\\video\\result", "out%07d.png")
+
+process_files("G:\\FakeAppData\\frames_128", "G:\\FakeAppData\\video\\result", "out%07d.png")

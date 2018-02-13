@@ -28,6 +28,18 @@ train_batchB = minibatchAB(train_B, batchSize)
 
 min_loss_A = 999
 last_epoch = -1
+min_gloss_A = 999
+
+
+def save(suf=""):
+    print("Saved Model to " + model_dir)
+    encoder.save_weights(model_dir + "encoder%s.h5" % suf)
+    decoder_A.save_weights(model_dir + "decoder_A%s.h5" % suf)
+    decoder_B.save_weights(model_dir + "decoder_B%s.h5" % suf)
+    netDA.save_weights(model_dir + "netDA%s.h5" % suf)
+    netDB.save_weights(model_dir + "netDB%s.h5" % suf)
+
+
 while True:
     epoch, warped_A, target_A = next(train_batchA)
     epoch, warped_B, target_B = next(train_batchB)
@@ -76,11 +88,11 @@ while True:
         if loss_DA_display < min_loss_A and epoch > 5:
             min_loss_A = loss_DA_display
             # if gen_iterations % (display_iters * 3) == 0:
-            print("Saved Model to " + model_dir)
-            encoder.save_weights(model_dir + "encoder.h5")
-            decoder_A.save_weights(model_dir + "decoder_A.h5")
-            decoder_B.save_weights(model_dir + "decoder_B.h5")
-            netDA.save_weights(model_dir + "netDA.h5")
-            netDB.save_weights(model_dir + "netDB.h5")
+            save()
 
+        if loss_GA_display < min_gloss_A:
+            min_gloss_A = loss_GA_display
+            save("_lowg")
+
+        save("_epoch")
 print("Training Complete!")
